@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海報申請費用試算</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500&display=swap');
+
+  :root {
+    --ink: #1a1209;
+    --paper: #f5f0e8;
+    --accent: #b85c2a;
+    --divider: #c8b89a;
+    --muted: #7a6a55;
+    --highlight: #fff3e0;
+    --shadow: rgba(90,60,30,0.12);
+    --red: #c0392b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 2rem 1rem 5rem;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(180,155,110,0.08) 31px, rgba(180,155,110,0.08) 32px);
+  }
+
+  .container { max-width: 680px; margin: 0 auto; }
+
+  header {
+    text-align: center;
+    margin-bottom: 2.2rem;
+    padding-bottom: 1.4rem;
+    border-bottom: 2px solid var(--divider);
+  }
+  header::after {
+    content: '';
+    display: block;
+    width: 56px; height: 2px;
+    background: var(--accent);
+    margin: 0.5rem auto 0;
+  }
+  h1 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.75rem; font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+  .subtitle { font-size: 0.8rem; color: var(--muted); margin-top: 0.35rem; letter-spacing: 0.05em; }
+
+  /* ---- Item card ---- */
+  .item-card {
+    background: #fffdf8;
+    border: 1px solid var(--divider);
+    border-radius: 5px;
+    padding: 1.4rem 1.4rem 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px var(--shadow);
+    animation: fadeIn 0.22s ease;
+  }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
+
+  .item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .item-num {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 0.95rem; font-weight: 600;
+    color: var(--accent);
+    display: flex; align-items: center; gap: 0.45rem;
+  }
+  .item-num::before {
+    content: '';
+    display: inline-block;
+    width: 4px; height: 1em;
+    background: var(--accent); border-radius: 2px;
+  }
+  .del-btn {
+    background: none; border: 1px solid #ddd;
+    border-radius: 3px; padding: 0.22rem 0.55rem;
+    font-size: 0.76rem; color: var(--muted);
+    cursor: pointer; transition: all 0.18s;
+  }
+  .del-btn:hover { border-color: var(--red); color: var(--red); }
+
+  .item-result {
+    display: none;
+    margin-top: 0.8rem;
+    padding: 0.55rem 0.85rem;
+    background: #2a1f0f;
+    color: #ffd28a;
+    border-radius: 3px;
+    font-size: 0.88rem;
+    font-family: 'Noto Serif TC', serif;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .item-result.show { display: flex; }
+  .item-result-detail {
+    font-size: 0.72rem;
+    color: rgba(255,220,140,0.55);
+    font-family: 'Noto Sans TC', sans-serif;
+    line-height: 1.7;
+  }
+
+  /* ---- Form elements ---- */
+  .f-label {
+    display: block;
+    font-size: 0.8rem; color: var(--muted);
+    margin-bottom: 0.3rem; letter-spacing: 0.03em;
+  }
+  select, input[type=number], input[type=text], input[type=date] {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--divider);
+    border-radius: 3px;
+    background: #fffdf8;
+    font-family: inherit; font-size: 0.88rem;
+    color: var(--ink); outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 0.8rem;
+  }
+  select:focus, input:focus { border-color: var(--accent); }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+
+  .radio-group { display: flex; gap: 0.7rem; margin-bottom: 0.8rem; flex-wrap: wrap; }
+  .radio-opt {
+    flex: 1; min-width: 100px;
+    display: flex; align-items: center; gap: 0.4rem;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid var(--divider); border-radius: 3px;
+    cursor: pointer; font-size: 0.82rem;
+    transition: all 0.18s; background: #fffdf8;
+  }
+  .radio-opt input { accent-color: var(--accent); }
+  .radio-opt:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--highlight); color: var(--accent);
+  }
+
+  .note {
+    background: var(--highlight);
+    border-left: 3px solid var(--accent);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0 3px 3px 0;
+    font-size: 0.76rem; color: var(--muted);
+    margin-bottom: 0.8rem; line-height: 1.6;
+  }
+
+  .hidden { display: none !important; }
+
+  /* ---- Buttons ---- */
+  .btn-add {
+    width: 100%; padding: 0.72rem;
+    background: none; border: 1.5px dashed var(--divider);
+    border-radius: 4px; color: var(--muted);
+    font-family: inherit; font-size: 0.88rem;
+    cursor: pointer; transition: all 0.18s;
+    margin-bottom: 1rem; letter-spacing: 0.05em;
+  }
+  .btn-add:hover { border-color: var(--accent); color: var(--accent); background: var(--highlight); }
+
+  .btn-row { display: flex; gap: 0.8rem; margin-top: 0.3rem; }
+  .btn {
+    flex: 1; padding: 0.78rem;
+    border: none; border-radius: 3px;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 0.92rem; letter-spacing: 0.1em;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #9a4820; }
+  .btn-secondary {
+    background: #fffdf8; color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  .btn-secondary:hover { background: var(--highlight); }
+
+  /* ---- Grand total ---- */
+  .grand-total {
+    background: var(--ink); color: #fff;
+    border-radius: 5px;
+    padding: 1.4rem 1.6rem;
+    margin-bottom: 1.2rem;
+  }
+  .grand-total.hidden { display: none; }
+  .total-label { font-size: 0.82rem; color: rgba(255,255,255,0.5); letter-spacing: 0.08em; margin-bottom: 0.15rem; }
+  .total-amount { font-family: 'Noto Serif TC', serif; font-size: 2.1rem; font-weight: 700; color: #ffd28a; margin-bottom: 0.6rem; }
+  .total-lines { font-size: 0.76rem; color: rgba(255,255,255,0.45); line-height: 1.9; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>海報申請費用試算</h1>
+    <p class="subtitle">Poster Application Fee Calculator</p>
+  </header>
+
+  <div id="items-container"></div>
+
+  <button class="btn-add" onclick="addItem()">＋ 新增需求項目</button>
+
+  <div id="grand-total" class="grand-total hidden">
+    <div class="total-label">總計費用</div>
+    <div id="total-amount" class="total-amount">—</div>
+    <div id="total-lines" class="total-lines"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="calcAll()">計算全部費用</button>
+    <button class="btn btn-secondary" onclick="resetAll()">重新填寫</button>
+  </div>
+
+</div>
+
+<script>
+const PAPER_LABELS = {
+  A4:'A4（21×29.7cm）', A3:'A3（29.7×42cm）',
+  '4k':'四開（39.5×54.8cm）', '2k':'對開（54.8×79cm）', '1k':'全開（79×109cm）',
+  med:'醫學影像處理', illus:'手繪插圖', special:'特殊尺寸'
+};
+const PAPER_PRICE = {
+  A4:{design:350,direct:25}, A3:{design:400,direct:75},
+  '4k':{design:500,direct:175}, '2k':{design:600,direct:250}, '1k':{design:1000,direct:500}
+};
+const CLOTH_BASE = {
+  design: {'90':1000, '110':1500},
+  direct: {'90':500,  '110':1000}
+};
+const CLOTH_STEP = {
+  design: {'90':300, '110':400},
+  direct: {'90':300, '110':400}
+};
+
+let uid = 0;
+
+function addItem() {
+  uid++;
+  const id = uid;
+  const el = document.createElement('div');
+  el.className = 'item-card';
+  el.id = 'item-' + id;
+  el.innerHTML = buildItemHTML(id);
+  document.getElementById('items-container').appendChild(el);
+  reNumber();
+}
+
+function removeItem(id) {
+  const el = document.getElementById('item-' + id);
+  if (el) el.remove();
+  reNumber();
+  document.getElementById('grand-total').classList.add('hidden');
+}
+
+function reNumber() {
+  document.querySelectorAll('.item-card').forEach((c, i) => {
+    c.querySelector('.item-num-text').textContent = '第 ' + (i+1) + ' 項需求';
+  });
+}
+
+function buildItemHTML(id) {
+  return `
+  <div class="item-header">
+    <div class="item-num"><span class="item-num-text">第 ${id} 項需求</span></div>
+    <button class="del-btn" onclick="removeItem(${id})">✕ 移除</button>
+  </div>
+
+  <label class="f-label">材質</label>
+  <div class="radio-group">
+    <label class="radio-opt"><input type="radio" name="mat${id}" value="paper" checked onchange="onMatChange(${id})"> 📄 紙質</label>
+    <label class="radio-opt"><input type="radio" name="mat${id}" value="cloth" onchange="onMatChange(${id})"> 🎌 布質</label>
+  </div>
+
+  <div id="P${id}">
+    <label class="f-label">尺寸規格</label>
+    <select id="ps${id}" onchange="onSizeChange(${id})">
+      <option value="">— 請選擇 —</option>
+      <option value="A4">A4（21×29.7 cm）</option>
+      <option value="A3">A3（29.7×42 cm）</option>
+      <option value="4k">四開（39.5×54.8 cm）</option>
+      <option value="2k">對開（54.8×79 cm）</option>
+      <option value="1k">全開（79×109 cm）</option>
+      <option value="med">醫學投稿影像處理／圖片掃描</option>
+      <option value="illus">教學手繪插圖</option>
+      <option value="special">特殊尺寸（超出全開）</option>
+    </select>
+
+    <div id="Psp${id}" class="hidden">
+      <div class="note">全開基本價 1,000 元＋超出部分每才（30×30 cm）加收 100 元，不足 1 才以 1 才計算。</div>
+      <div class="row2">
+        <div><label class="f-label">長（cm）</label><input type="number" id="spw${id}" min="1" placeholder="例：120"></div>
+        <div><label class="f-label">寬（cm）</label><input type="number" id="sph${id}" min="1" placeholder="例：150"></div>
+      </div>
+    </div>
+
+    <div id="Pillus${id}" class="hidden">
+      <div class="note">依圖像難易程度收費：每圖 500～5,000 元，請洽詢後以實際報價為準。</div>
+      <div class="row2">
+        <div><label class="f-label">圖數（圖）</label><input type="number" id="icnt${id}" min="1" value="1"></div>
+        <div><label class="f-label">每圖金額（元）</label><input type="number" id="iprice${id}" min="500" max="5000" value="500"></div>
+      </div>
+    </div>
+
+    <div id="Pmed${id}" class="hidden">
+      <div class="note">每張 50 元。</div>
+    </div>
+
+    <div id="Pout${id}">
+      <label class="f-label">輸出方式</label>
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="out${id}" value="design" checked> 設計、製作、輸出</label>
+        <label class="radio-opt"><input type="radio" name="out${id}" value="direct"> 直接輸出</label>
+      </div>
+    </div>
+
+    <div id="Pqw${id}">
+      <label class="f-label">輸出張數</label>
+      <input type="number" id="pqty${id}" min="1" value="1">
+      <div id="Pqn${id}" class="note hidden">第 1 張含設計製作費，其餘張以直接輸出單價計算。</div>
+    </div>
+  </div>
+
+  <div id="C${id}" class="hidden">
+    <label class="f-label">輸出方式</label>
+    <div class="radio-group">
+      <label class="radio-opt"><input type="radio" name="cout${id}" value="design" checked onchange="onClothModeChange(${id})"> 設計、製作、輸出</label>
+      <label class="radio-opt"><input type="radio" name="cout${id}" value="direct" onchange="onClothModeChange(${id})"> 直接輸出</label>
+    </div>
+    <label class="f-label">布寬規格</label>
+    <div class="radio-group">
+      <label class="radio-opt"><input type="radio" name="cw${id}" value="90" checked> 寬 90 cm</label>
+      <label class="radio-opt"><input type="radio" name="cw${id}" value="110"> 寬 110 cm</label>
+    </div>
+    <div id="Cnote${id}" class="note">
+      設計製作：90cm 基本 1,000 元／110cm 基本 1,500 元；超出150cm每30cm加價（90cm +300元／110cm +400元）
+    </div>
+    <label class="f-label">長邊（cm）</label>
+    <input type="number" id="clen${id}" min="1" value="150" placeholder="輸入長邊 cm">
+    <label class="f-label">數量（幅）</label>
+    <input type="number" id="cqty${id}" min="1" value="1">
+  </div>
+
+  <div id="ires${id}" class="item-result">
+    <span id="iramt${id}">—</span>
+    <span id="irdet${id}" class="item-result-detail"></span>
+  </div>
+  `;
+}
+
+function onMatChange(id) {
+  const mat = document.querySelector(`input[name="mat${id}"]:checked`).value;
+  document.getElementById('P'+id).classList.toggle('hidden', mat !== 'paper');
+  document.getElementById('C'+id).classList.toggle('hidden', mat !== 'cloth');
+  document.getElementById('grand-total').classList.add('hidden');
+  document.getElementById('ires'+id).classList.remove('show');
+}
+
+function onClothModeChange(id) {
+  const cmode = document.querySelector(`input[name="cout${id}"]:checked`).value;
+  const noteEl = document.getElementById('Cnote'+id);
+  if (cmode === 'design') {
+    noteEl.textContent = '設計製作：90cm 基本 1,000 元／110cm 基本 1,500 元；超出 150cm 每 30cm 加價（90cm +300元／110cm +400元）';
+  } else {
+    noteEl.textContent = '直接輸出：90cm 基本 500 元／110cm 基本 1,000 元；超出 150cm 每 30cm 加價（90cm +300元／110cm +400元）';
+  }
+  document.getElementById('grand-total').classList.add('hidden');
+  document.getElementById('ires'+id).classList.remove('show');
+}
+
+function onSizeChange(id) {
+  const v = document.getElementById('ps'+id).value;
+  document.getElementById('Psp'+id).classList.toggle('hidden', v !== 'special');
+  document.getElementById('Pillus'+id).classList.toggle('hidden', v !== 'illus');
+  document.getElementById('Pmed'+id).classList.toggle('hidden', v !== 'med');
+  document.getElementById('Pout'+id).classList.toggle('hidden', v === 'illus' || v === 'med' || !v);
+  document.getElementById('Pqw'+id).classList.toggle('hidden', v === 'illus' || !v);
+  document.getElementById('grand-total').classList.add('hidden');
+  document.getElementById('ires'+id).classList.remove('show');
+}
+
+function calcItem(id) {
+  const mat = document.querySelector(`input[name="mat${id}"]:checked`).value;
+
+  if (mat === 'paper') {
+    const size = document.getElementById('ps'+id).value;
+    if (!size) { alert('第 ' + getItemNum(id) + '：請選擇尺寸規格'); return null; }
+
+    if (size === 'med') {
+      const qty = parseInt(document.getElementById('pqty'+id).value) || 1;
+      const total = qty * 50;
+      return { total, summary:'紙質／醫學影像 '+qty+'張', detail:'50元 × '+qty+'張 = '+total+'元' };
+    }
+    if (size === 'illus') {
+      const cnt = parseInt(document.getElementById('icnt'+id).value) || 1;
+      const price = parseInt(document.getElementById('iprice'+id).value) || 500;
+      const total = cnt * price;
+      return { total, summary:'紙質／手繪插圖 '+cnt+'圖', detail:price+'元/圖 × '+cnt+'圖 = '+total+'元（以報價為準）' };
+    }
+    if (size === 'special') {
+      const w = parseFloat(document.getElementById('spw'+id).value);
+      const h = parseFloat(document.getElementById('sph'+id).value);
+      if (!w || !h) { alert('第 ' + getItemNum(id) + '：請輸入特殊尺寸長寬'); return null; }
+      const extraArea = w * h - 79 * 109;
+      const extraCai = extraArea > 0 ? Math.ceil(extraArea / 900) : 0;
+      const perSheet = 1000 + extraCai * 100;
+      const qty = parseInt(document.getElementById('pqty'+id).value) || 1;
+      const mode = document.querySelector(`input[name="out${id}"]:checked`).value;
+      const total = mode === 'design'
+        ? (qty === 1 ? perSheet : perSheet + (qty-1)*perSheet)
+        : qty * perSheet;
+      const detail = '全開1,000元' + (extraCai > 0 ? '＋'+extraCai+'才×100元' : '') + ' = '+perSheet+'元/張 × '+qty+'張 = '+total+'元';
+      return { total, summary:'紙質／特殊尺寸 '+w+'×'+h+'cm', detail };
+    }
+
+    const p = PAPER_PRICE[size];
+    const qty = parseInt(document.getElementById('pqty'+id).value) || 1;
+    const mode = document.querySelector(`input[name="out${id}"]:checked`).value;
+    let total, detail;
+    if (mode === 'design') {
+      if (qty === 1) { total = p.design; detail = '設計製作輸出 1張：'+p.design+'元'; }
+      else { total = p.design + (qty-1)*p.direct; detail = '第1張'+p.design+'元＋後'+(qty-1)+'張×'+p.direct+'元 = '+total+'元'; }
+    } else {
+      total = qty * p.direct;
+      detail = '直接輸出 '+p.direct+'元 × '+qty+'張 = '+total+'元';
+    }
+    return { total, summary:'紙質／'+PAPER_LABELS[size]+' '+qty+'張', detail };
+  }
+
+  // Cloth
+  const cmode = document.querySelector(`input[name="cout${id}"]:checked`).value;
+  const wKey = document.querySelector(`input[name="cw${id}"]:checked`).value;
+  const len = parseFloat(document.getElementById('clen'+id).value);
+  const qty = parseInt(document.getElementById('cqty'+id).value) || 1;
+  if (!len || len < 1) { alert('第 ' + getItemNum(id) + '：請輸入布質長邊'); return null; }
+  const base = CLOTH_BASE[cmode][wKey];
+  const step = CLOTH_STEP[cmode][wKey];
+  let price = base;
+  let bands = 0;
+  if (len > 150) { bands = Math.ceil((len-150)/30); price = base + bands*step; }
+  const total = price * qty;
+  const modeLabel = cmode === 'design' ? '設計製作輸出' : '直接輸出';
+  const detail = modeLabel+'／'+wKey+'cm寬×'+len+'cm 基本'+base+'元'+(bands>0?'＋'+bands+'段×'+step+'元':'')+' = '+price+'元/幅 × '+qty+'幅 = '+total+'元';
+  return { total, summary:'布質（'+modeLabel+'）／'+wKey+'cm×'+len+'cm '+qty+'幅', detail };
+}
+
+function getItemNum(id) {
+  const cards = [...document.querySelectorAll('.item-card')];
+  const idx = cards.findIndex(c => c.id === 'item-'+id);
+  return '第'+(idx+1)+'項';
+}
+
+function calcAll() {
+  const cards = [...document.querySelectorAll('.item-card')];
+  if (cards.length === 0) { alert('請先新增至少一項需求'); return; }
+  let grand = 0;
+  const lines = [];
+  for (let i = 0; i < cards.length; i++) {
+    const id = parseInt(cards[i].id.replace('item-',''));
+    const r = calcItem(id);
+    if (!r) return;
+    grand += r.total;
+    document.getElementById('iramt'+id).textContent = 'NT$ ' + r.total.toLocaleString() + ' 元';
+    document.getElementById('irdet'+id).textContent = r.detail;
+    document.getElementById('ires'+id).classList.add('show');
+    lines.push('第'+(i+1)+'項 '+r.summary+'：'+r.total.toLocaleString()+' 元');
+  }
+  document.getElementById('total-amount').textContent = 'NT$ ' + grand.toLocaleString() + ' 元';
+  document.getElementById('total-lines').innerHTML = lines.join('<br>') + (lines.length > 1 ? '<br>─────<br>合計 ' + grand.toLocaleString() + ' 元' : '');
+  const gt = document.getElementById('grand-total');
+  gt.classList.remove('hidden');
+  gt.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function resetAll() {
+  if (!confirm('確定要清除所有項目重新填寫？')) return;
+  document.getElementById('items-container').innerHTML = '';
+  document.getElementById('grand-total').classList.add('hidden');
+  uid = 0;
+  addItem();
+}
+
+addItem();
+</script>
+</body>
+</html>
